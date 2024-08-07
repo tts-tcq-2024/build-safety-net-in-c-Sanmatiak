@@ -1,42 +1,39 @@
+#include <gtest/gtest.h>
 #include "Soundex.h"
-#include <cctype>
-#include <unordered_map>
-static const std::unordered_map<char, char> soundexCodes {
-    {'B', '1'}, {'F', '1'}, {'P', '1'}, {'V', '1'},
-    {'C', '2'}, {'G', '2'}, {'J', '2'}, {'K', '2'}, {'Q', '2'},
-    {'S', '2'}, {'X', '2'}, {'Z', '2'},
-    {'D', '3'}, {'T', '3'},
-    {'L', '4'},
-    {'M', '5'}, {'N', '5'},
-    {'R', '6'}
-};
-char getSoundexCode(char c) {
-    c = std::toupper(c);
-    auto it = soundexCodes.find(c);
-    return (it != soundexCodes.end()) ? it->second : '0';
+TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits) {
+//AAA
+  char soundex[5];
+generateSoundex("$rrr", soundex);
+ASSERT_STREQ(soundex,"$666");
 }
-void appendSoundexCode(std::string& soundex, char code, char& prevCode) {
-    if (code != '0' && code != prevCode) {
-        soundex += code;
-        prevCode = code;
-    }
+TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_1) {
+//AAA
+char soundex[5];
+generateSoundex("pvt", soundex);
+ASSERT_STREQ(soundex,"P130");
 }
-std::string processInitialCharacter(const std::string& name) {
-    std::string soundex;
-    soundex += std::toupper(name[0]);
-    return soundex;
+TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_2) {
+//AAA
+  char soundex[5];
+generateSoundex("*#12hi", soundex);
+ASSERT_STREQ(soundex,"*000");
 }
-void processRemainingCharacters(const std::string& name, std::string& soundex) {
-    char prevCode = getSoundexCode(name[0]);
-    for (size_t i = 1; i < name.length() && soundex.length() < 4; ++i) {
-        char code = getSoundexCode(name[i]);
-        appendSoundexCode(soundex, code, prevCode);
-    }
+TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_vowels) {
+//AA
+char soundex[5];
+generateSoundex("aeiou", soundex);
+ASSERT_STREQ(soundex,"A000");
 }
-std::string generateSoundex(const std::string& name) {
-    if (name.empty()) return "";
-    std::string soundex = processInitialCharacter(name);
-    processRemainingCharacters(name, soundex);
-    soundex.resize(4, '0');
-    return soundex;
+ 
+TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_space) {
+//AAA
+char soundex[5];
+generateSoundex(" ", soundex);
+ASSERT_STREQ(soundex," 000");
+}
+TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_3) {
+//AAA
+char soundex[5];
+generateSoundex("bcdlmnr", soundex);
+ASSERT_STREQ(soundex,"B234");
 }
